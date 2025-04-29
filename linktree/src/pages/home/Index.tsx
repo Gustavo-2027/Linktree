@@ -1,4 +1,4 @@
-import { FaAddressBook, FaFacebook, FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaFacebook, FaGithub, FaLinkedin } from "react-icons/fa";
 import Social from "../../components/social/Index";
 
 const Home = () => {
