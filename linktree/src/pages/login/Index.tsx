@@ -1,15 +1,27 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/social/input/Index";
 import { FormEvent, useState } from "react";
 import { auth } from "../../services/firebaseConnection";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const Login = () => {
-  const [email, setEmail] = useState();
-  const [senha, setSenha] = useState();
+  const [email, setEmail] = useState<string>("");
+  const [senha, setSenha] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    
+    if (email === "" || senha === "") {
+      alert("Preencha todos os campos");
+      return;
+    }
+    signInWithEmailAndPassword(auth, email, senha)
+      .then(() => {
+        navigate("/admin", { replace: true });
+      })
+      .catch((err) => {
+        alert(`Erro: ${err}`);
+      });
   };
 
   return (
@@ -22,7 +34,10 @@ const Login = () => {
           </span>
         </h1>
       </Link>
-      <form className="w-full max-w-xl flex flex-col px-1" onSubmit={handleSubmit}>
+      <form
+        className="w-full max-w-xl flex flex-col px-1"
+        onSubmit={handleSubmit}
+      >
         <Input
           placeholder="Digite seu Email"
           type="email"
