@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import Header from "../../components/header/Index";
 import Input from "../../components/social/input/Index";
 import { BiTrash } from "react-icons/bi";
+import { fireStore } from "../../services/firebaseConnection";
+import { addDoc, collection } from "firebase/firestore";
 
 const Admin = () => {
   const [nameInput, setNameInput] = useState("");
@@ -9,10 +11,35 @@ const Admin = () => {
   const [textColorInput, setTextColorInput] = useState("#f1f1f1");
   const [backgroundColorInput, setBackgroundColorInput] = useState("#00000");
 
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    alert("test")
+    if(nameInput.trim() === "" || urlInput.trim() === "") {
+      alert("preencha todos os campos")
+      return
+    }
+
+   addDoc(collection(fireStore, "links"), {
+      name: nameInput,
+      url: urlInput,
+      bg: backgroundColorInput,
+      color: textColorInput,
+      created: new Date()
+    }).then(() => {
+      setNameInput("")
+      setUrlInput("")
+    }).catch((err) => {
+      alert("Erro: " + err)
+    })
+  }
+
   return (
     <div className="w-full min-h-dvh bg-gradient-to-r from-zinc-500 via-zinc-600 to-zinc-800 text-white flex flex-col items-center py-7 px-2">
       <Header />
-      <form className="flex flex-col my-8 w-full max-w-xl">
+      <form
+        className="flex flex-col my-8 w-full max-w-xl"
+        onSubmit={handleSubmit}
+      >
         <label htmlFor="inome" className="text-white font-medium mt-2 mb-3">
           Nome do Link
         </label>
@@ -92,13 +119,14 @@ const Admin = () => {
         </button>
       </form>
       <h2 className="font-bold mb-4 text-2xl">Meus Links</h2>
-      <article className="flex items-center justify-between w-11/12 max-w-lg py-3 px-2 mb-2 rounded"
-      style={{background: "#502589"}}
+      <article
+        className="flex items-center justify-between w-11/12 max-w-lg py-3 px-2 mb-2 rounded"
+        style={{ background: "#502589" }}
       >
-        <p>Nomedada</p> 
+        <p>Nomedada</p>
         <div className="flex justify-center items-center">
           <button className="border border-dashed p-1 rounded">
-            <BiTrash size={15}/>
+            <BiTrash size={15} />
           </button>
         </div>
       </article>
