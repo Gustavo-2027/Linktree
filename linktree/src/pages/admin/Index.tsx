@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Header from "../../components/header/Index";
 import Input from "../../components/social/input/Index";
+import { BiTrash } from "react-icons/bi";
 
 const Admin = () => {
   const [nameInput, setNameInput] = useState("");
@@ -63,15 +64,44 @@ const Admin = () => {
             />
           </div>
         </section>
-        <div className="flex flex-col justify-start items-center mb-7 p-1 border-gray-100/25 border-1 rounded-md w-full text-center">
-          <label htmlFor="" className="text-white font-medium mt-2 mb-3">
-            Veja como está ficando: 
-          <article className="w-11/12 max-w-lg flex flex-col items-center justify-between rounded px-1 py-3 " style={{marginBottom: 8, marginTop: 8, backgroundColor: backgroundColorInput}}>
-            <p style={{color: textColorInput}} className="font-medium">{nameInput}</p>
-          </article>
-          </label>
-        </div>
+        {nameInput.trim() !== "" && (
+          <div className="flex flex-col justify-start items-center mb-7 p-1 border-gray-100/25 border-1 rounded-md w-full text-center">
+            <label htmlFor="" className="text-white font-medium mt-2 mb-3">
+              Veja como está ficando:
+              <article
+                className="max-w-lg flex flex-col items-center justify-center rounded w-80 py-3 duration-700 hover:opacity-60 cursor-pointer"
+                style={{
+                  marginBottom: 8,
+                  marginTop: 8,
+                  backgroundColor: backgroundColorInput,
+                }}
+              >
+                <p style={{ color: textColorInput }} className="font-medium">
+                  {nameInput}
+                </p>
+              </article>
+            </label>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          className="mb-7 bg-blue-600 h-9 rounded-md font-medium gap-4 text-center flex justify-center items-center"
+        >
+          Cadastrar
+        </button>
       </form>
+      <h2 className="font-bold mb-4 text-2xl">Meus Links</h2>
+      <article className="flex items-center justify-between w-11/12 max-w-lg py-3 px-2 mb-2 rounded"
+      style={{background: "#502589"}}
+      >
+        <p>Nomedada</p> 
+        <div className="flex justify-center items-center">
+          <button className="border border-dashed p-1 rounded">
+            <BiTrash size={15}/>
+          </button>
+        </div>
+      </article>
     </div>
   );
 };
