@@ -1,36 +1,84 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Header from "../../components/header/Index";
 import Input from "../../components/social/input/Index";
 import { BiTrash } from "react-icons/bi";
 import { fireStore } from "../../services/firebaseConnection";
-import { addDoc, collection } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
+
+interface LinkProps {
+  id: string;
+  name: string;
+  url: string;
+  bg: string;
+  color: string;
+}
 
 const Admin = () => {
   const [nameInput, setNameInput] = useState("");
   const [urlInput, setUrlInput] = useState("");
   const [textColorInput, setTextColorInput] = useState("#f1f1f1");
   const [backgroundColorInput, setBackgroundColorInput] = useState("#00000");
+  const [links, setLinks] = useState<LinkProps[]>([])
+
+  useEffect(() => {
+    const linksRef = collection(fireStore, "links");
+    const queryRef = query(linksRef, orderBy("created", "asc"));
+
+    const unsub = onSnapshot(queryRef, (snapshot) => {
+      const lista = [] as LinkProps[];
+      snapshot.forEach((doc) => {
+        lista.push({
+          id: doc.id,
+          name: doc.data().name,
+          url: doc.data().url,
+          bg: doc.data().bg,
+          color: doc.data().color,
+        });
+      });
+
+      setLinks(lista)
+    });
+
+
+    return () => {
+      unsub()
+    }
+  }, []);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    alert("test")
-    if(nameInput.trim() === "" || urlInput.trim() === "") {
-      alert("preencha todos os campos")
-      return
+    if (nameInput.trim() === "" || urlInput.trim() === "") {
+      alert("preencha todos os campos");
+      return;
     }
 
-   addDoc(collection(fireStore, "links"), {
+    addDoc(collection(fireStore, "links"), {
       name: nameInput,
       url: urlInput,
       bg: backgroundColorInput,
       color: textColorInput,
-      created: new Date()
-    }).then(() => {
-      setNameInput("")
-      setUrlInput("")
-    }).catch((err) => {
-      alert("Erro: " + err)
+      created: new Date(),
     })
+      .then(() => {
+        setNameInput("");
+        setUrlInput("");
+      })
+      .catch((err) => {
+        alert("Erro: " + err);
+      });
+  };
+
+ const handleDeleteLink =  async(id: string) => {
+    const docRef = doc(fireStore, "links", id)
+    await(deleteDoc(docRef))
   }
 
   return (
@@ -119,17 +167,19 @@ const Admin = () => {
         </button>
       </form>
       <h2 className="font-bold mb-4 text-2xl">Meus Links</h2>
-      <article
+      {links.map(item => (
+        <article key={item.id}
         className="flex items-center justify-between w-11/12 max-w-lg py-3 px-2 mb-2 rounded"
-        style={{ background: "#502589" }}
+        style={{ background: item.bg, color: item.color }}
       >
-        <p>Nomedada</p>
+        <p>{item.name}</p>
         <div className="flex justify-center items-center">
-          <button className="border border-dashed p-1 rounded">
+          <button className="border border-dashed p-1 rounded" onClick={(() => handleDeleteLink(item.id))}>
             <BiTrash size={15} />
           </button>
         </div>
       </article>
+      ))}
     </div>
   );
 };
