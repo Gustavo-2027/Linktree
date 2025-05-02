@@ -1,7 +1,7 @@
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react'
 import Header from '../../components/header/Index'
 import Input from '../../components/social/input/Index'
-import { doc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { fireStore } from '../../services/firebaseConnection'
 
 const Redes = () => {
@@ -10,8 +10,25 @@ const Redes = () => {
   const [instagram, setInstagram] = useState("")
   const [youtube, setYoutube] = useState("")
 
+  useEffect(() => {
+    const loadLinks = () => {
+      const docRef = doc(fireStore, "social", "link")
+      getDoc(docRef)
+      .then((snap) => {
+        if(snap.data() !== undefined) {
+          setFacebook(snap.data()?.facebook)
+          setInstagram(snap.data()?.instagram)
+          setYoutube(snap.data()?.youtube)
+        }
+      })
+    }
+
+    loadLinks()
+  },[])
+
   const handleRegister = (e: FormEvent) => {
     e.preventDefault()
+
     setDoc(doc(fireStore, "social", "link"), {
       facebook: facebook,
       instagram: instagram,
